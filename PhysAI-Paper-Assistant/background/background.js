@@ -11,22 +11,31 @@ const STORE_SETTINGS = 'settings';
 
 // Global database reference
 let db = null;
+let dbInitPromise = null;
 
 /**
  * Initialize IndexedDB
  */
 async function initDB() {
-  return new Promise((resolve, reject) => {
+  if (db) return db;
+  if (dbInitPromise) return dbInitPromise;
+  
+  dbInitPromise = new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-    request.onerror = () => reject(request.error);
+    request.onerror = () => {
+      console.error('IndexedDB open error:', request.error);
+      reject(request.error);
+    };
     request.onsuccess = () => {
       db = request.result;
+      console.log('PhysAI: Database opened successfully');
       resolve(db);
     };
 
     request.onupgradeneeded = (event) => {
       const database = event.target.result;
+      console.log('PhysAI: Database upgrade needed');
 
       // Papers store with indexes
       if (!database.objectStoreNames.contains(STORE_PAPERS)) {
@@ -42,6 +51,20 @@ async function initDB() {
       }
     };
   });
+  
+  return dbInitPromise;
+}
+
+/**
+ * Ensure database is initialized before any operation
+ */
+async function ensureDB() {
+  if (!db) {
+    await initDB();
+  }
+  if (!db) {
+    throw new Error('Database not initialized');
+  }
 }
 
 /**
@@ -193,6 +216,9 @@ async function callLLM(prompt, systemPrompt = '') {
     case 'claude':
       response = await callClaude(apiKey, model, prompt, systemPrompt);
       break;
+    case 'minimax':
+      response = await callMinimax(apiKey, model, prompt, systemPrompt);
+      break;
     default:
       throw new Error(`Unknown LLM provider: ${provider}`);
   }
@@ -319,6 +345,37 @@ async function callClaude(apiKey, model, prompt, systemPrompt) {
 }
 
 /**
+ * MiniMax API call
+ * MiniMax API: https://platform.minimaxi.com
+ */
+async function callMinimax(apiKey, model, prompt, systemPrompt) {
+  const response = await fetch('https://api.minimaxi.chat/v1/text/chatcompletion_pro', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: model,
+      messages: [
+        ...(systemPrompt ? [{ role: 'system', content: systemPrompt }] : []),
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.3,
+      max_tokens: 4000
+    })
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(`MiniMax API error: ${error.base_resp?.status_msg || error.message || 'Unknown error'}`);
+  }
+
+  const data = await response.json();
+  return data.choices[0].message.content;
+}
+
+/**
  * Generate embedding using configured provider
  */
 async function generateEmbedding(text) {
@@ -337,6 +394,8 @@ async function generateEmbedding(text) {
       return await generateOpenAIEmbedding(apiKey, model, text);
     case 'gemini':
       return await generateGeminiEmbedding(apiKey, text);
+    case 'minimax':
+      return await generateMinimaxEmbedding(apiKey, model, text);
     default:
       throw new Error(`Unknown embedding provider: ${provider}`);
   }
@@ -388,6 +447,32 @@ async function generateGeminiEmbedding(apiKey, text) {
 
   const data = await response.json();
   return data.embedding.values;
+}
+
+/**
+ * MiniMax Embedding generation
+ * API: https://platform.minimaxi.com/document/Guides/Computing/Embedding
+ */
+async function generateMinimaxEmbedding(apiKey, model, text) {
+  const response = await fetch('https://api.minimaxi.chat/v1/text/embedding', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: model,
+      input: text
+    })
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(`MiniMax Embedding error: ${error.base_resp?.status_msg || error.message || 'Unknown error'}`);
+  }
+
+  const data = await response.json();
+  return data.data[0].embedding;
 }
 
 /**
@@ -502,6 +587,9 @@ function generateGeminiFigurePrompt(description) {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   (async () => {
     try {
+      // Ensure database is ready before any operation
+      await ensureDB();
+      
       switch (message.type) {
         case 'GET_ALL_PAPERS':
           sendResponse({ success: true, data: await getAllPapers() });
@@ -568,6 +656,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           sendResponse({ success: false, error: 'Unknown message type' });
       }
     } catch (error) {
+      console.error('PhysAI: Message handler error:', error);
       sendResponse({ success: false, error: error.message });
     }
   })();

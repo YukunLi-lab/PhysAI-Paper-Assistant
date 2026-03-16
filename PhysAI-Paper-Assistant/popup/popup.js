@@ -5,11 +5,18 @@
 
 let currentOutput = '';
 
-// Initialize popup
-document.addEventListener('DOMContentLoaded', async () => {
-  await loadPapers();
-  initializeEventListeners();
-});
+// Initialize popup - run immediately when script loads
+// Using immediate execution instead of DOMContentLoaded for reliability
+(function init() {
+  console.log('PhysAI: Popup script loading...');
+  
+  // Give DOM a moment to be ready
+  setTimeout(() => {
+    initializeEventListeners();
+    loadPapers().catch(e => console.error('Load papers error:', e));
+    console.log('PhysAI: Init complete');
+  }, 50);
+})();
 
 /**
  * Initialize all event listeners

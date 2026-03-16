@@ -21,7 +21,8 @@
     "*://api.openai.com/*",
     "*://generativelanguage.googleapis.com/*",
     "*://api.x.ai/*",
-    "*://api.anthropic.com/*"
+    "*://api.anthropic.com/*",
+    "*://api.minimaxi.chat/*"
   ],
   "action": {
     "default_popup": "popup/index.html",
