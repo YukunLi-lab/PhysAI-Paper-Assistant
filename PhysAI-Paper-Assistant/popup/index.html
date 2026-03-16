@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhysAI Paper Assistant</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <div class="popup-header">
+      <div class="logo">
+        <span class="logo-icon">⚛️</span>
+        <span class="logo-text">PhysAI</span>
+      </div>
+      <button class="settings-btn" id="openSettings" title="Settings">⚙️</button>
+    </div>
+
+    <!-- Main Navigation -->
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-panel="library">
+        <span class="tab-icon">📚</span>
+        <span>Library</span>
+      </button>
+      <button class="nav-tab" data-panel="feed">
+        <span class="tab-icon">📥</span>
+        <span>Feed</span>
+      </button>
+      <button class="nav-tab" data-panel="writer">
+        <span class="tab-icon">✍️</span>
+        <span>Writer</span>
+      </button>
+    </div>
+
+    <!-- Library Panel -->
+    <div class="panel active" id="library-panel">
+      <div class="panel-header">
+        <h2>My Papers</h2>
+        <span class="paper-count" id="paperCount">0 papers</span>
+      </div>
+      <div class="search-box">
+        <input type="text" id="searchPapers" placeholder="Search papers...">
+      </div>
+      <div class="papers-list" id="papersList">
+        <div class="empty-state">
+          <span class="empty-icon">📄</span>
+          <p>No papers yet</p>
+          <p class="hint">Feed some papers to get started!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feed Panel -->
+    <div class="panel" id="feed-panel">
+      <div class="panel-header">
+        <h2>Feed Paper</h2>
+      </div>
+      <div class="drop-zone" id="dropZone">
+        <div class="drop-icon">📄</div>
+        <p>Drag & Drop PDF</p>
+        <p class="hint">or click to select</p>
+        <input type="file" id="fileInput" accept=".pdf" hidden>
+      </div>
+      <div class="feed-progress hidden" id="feedProgress">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <p class="progress-text" id="progressText">Processing...</p>
+      </div>
+      <div class="feed-status" id="feedStatus"></div>
+    </div>
+
+    <!-- Writer Panel -->
+    <div class="panel" id="writer-panel">
+      <div class="panel-header">
+        <h2>AI Writer</h2>
+      </div>
+      <div class="writer-input">
+        <textarea id="writerText" placeholder="Enter your paper topic, abstract, or draft..."></textarea>
+      </div>
+      <div class="writer-options">
+        <label class="checkbox-label">
+          <input type="checkbox" id="useReferences">
+          <span>Use library papers as references</span>
+        </label>
+      </div>
+      <div class="writer-actions">
+        <button class="btn primary" id="generateLatex">
+          <span>📝</span> Generate LaTeX
+        </button>
+        <button class="btn secondary" id="generateFigure">
+          <span>📊</span> Generate Figure
+        </button>
+      </div>
+      <div class="writer-output hidden" id="writerOutput">
+        <div class="output-header">
+          <h3>Output</h3>
+          <div class="output-actions">
+            <button class="icon-btn" id="copyOutput" title="Copy">📋</button>
+            <button class="icon-btn" id="downloadOutput" title="Download">⬇️</button>
+          </div>
+        </div>
+        <pre id="outputContent"></pre>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="popup-footer">
+      <button class="footer-btn" id="openSidebar">
+        <span>📖</span> Open Sidebar
+      </button>
+      <button class="footer-btn" id="openOnPaper">
+        <span>🔍</span> Analyze Page
+      </button>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

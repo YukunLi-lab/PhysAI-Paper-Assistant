@@ -1,0 +1,15 @@
+/**
+ * PhysAI Paper Assistant - PDF Viewer Styles
+ * Additional styles for PDF viewing
+ */
+
+/* PDF.js container adjustments */
+.pdf-container {
+  background: #1a1a2e;
+}
+
+/* Ensure PDF viewer has proper styling */
+embed[type="application/pdf"],
+object[type="application/pdf"] {
+  min-height: 100vh;
+}

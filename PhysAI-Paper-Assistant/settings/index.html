@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhysAI Paper Assistant - Settings</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="settings-container">
+    <!-- Header -->
+    <div class="settings-header">
+      <div class="logo">
+        <span class="logo-icon">⚛️</span>
+        <span class="logo-text">PhysAI Settings</span>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="settings-content">
+      <!-- API Configuration -->
+      <section class="settings-section">
+        <h2>🔑 API Configuration</h2>
+        <p class="section-desc">Configure your LLM and Embedding provider API keys</p>
+        
+        <div class="form-group">
+          <label for="llmProvider">LLM Provider</label>
+          <select id="llmProvider">
+            <option value="openai">OpenAI (GPT-4)</option>
+            <option value="gemini">Google Gemini</option>
+            <option value="grok">xAI Grok</option>
+            <option value="claude">Anthropic Claude</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="apiKey">API Key</label>
+          <input type="password" id="apiKey" placeholder="Enter your API key">
+          <span class="hint">Your API key is stored locally and never sent to any server</span>
+        </div>
+      </section>
+
+      <!-- Model Configuration -->
+      <section class="settings-section">
+        <h2>🤖 Model Configuration</h2>
+        
+        <div class="form-group">
+          <label for="chatModel">Chat Model</label>
+          <select id="chatModel">
+            <optgroup label="OpenAI">
+              <option value="gpt-4o">GPT-4o</option>
+              <option value="gpt-4-turbo">GPT-4 Turbo</option>
+              <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+            </optgroup>
+            <optgroup label="Gemini">
+              <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+              <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+            </optgroup>
+            <optgroup label="Grok">
+              <option value="grok-2">Grok-2</option>
+              <option value="grok-beta">Grok-Beta</option>
+            </optgroup>
+            <optgroup label="Claude">
+              <option value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet</option>
+              <option value="claude-3-opus-20240229">Claude 3 Opus</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="embeddingProvider">Embedding Provider</label>
+          <select id="embeddingProvider">
+            <option value="openai">OpenAI</option>
+            <option value="gemini">Google Gemini</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="embeddingModel">Embedding Model</label>
+          <select id="embeddingModel">
+            <optgroup label="OpenAI">
+              <option value="text-embedding-3-large">text-embedding-3-large</option>
+              <option value="text-embedding-3-small" selected>text-embedding-3-small</option>
+              <option value="text-embedding-ada-002">text-embedding-ada-002</option>
+            </optgroup>
+            <optgroup label="Gemini">
+              <option value="embedding-001">embedding-001</option>
+            </optgroup>
+          </select>
+        </div>
+      </section>
+
+      <!-- Similarity Settings -->
+      <section class="settings-section">
+        <h2>🎯 Similarity Settings</h2>
+        
+        <div class="form-group">
+          <label for="similarityThreshold">Similarity Threshold</label>
+          <div class="slider-group">
+            <input type="range" id="similarityThreshold" min="50" max="95" value="70">
+            <span id="thresholdValue">70%</span>
+          </div>
+          <span class="hint">Minimum similarity score to show related papers (70% recommended)</span>
+        </div>
+      </section>
+
+      <!-- Data Management -->
+      <section class="settings-section">
+        <h2>💾 Data Management</h2>
+        
+        <div class="data-stats">
+          <div class="stat-item">
+            <span class="stat-label">Stored Papers</span>
+            <span class="stat-value" id="paperCount">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Database Size</span>
+            <span class="stat-value" id="dbSize">0 KB</span>
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button class="btn danger" id="clearData">
+            🗑️ Clear All Data
+          </button>
+          <button class="btn secondary" id="exportData">
+            📤 Export Data
+          </button>
+        </div>
+      </section>
+
+      <!-- Save Button -->
+      <div class="settings-actions">
+        <button class="btn primary" id="saveSettings">
+          💾 Save Settings
+        </button>
+      </div>
+
+      <!-- Status Message -->
+      <div class="status-message" id="statusMessage"></div>
+    </div>
+
+    <!-- Footer -->
+    <div class="settings-footer">
+      <p>PhysAI Paper Assistant v1.0.0</p>
+      <p>All data stored locally in your browser - 100% private</p>
+    </div>
+  </div>
+
+  <script src="settings.js"></script>
+</body>
+</html>
