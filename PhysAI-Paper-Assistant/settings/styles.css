@@ -322,3 +322,90 @@ body {
   margin-bottom: 4px;
   color: var(--text-secondary);
 }
+
+/* Connection Status */
+.connection-status {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 500;
+  margin-left: 12px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.connection-status.connected {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--success);
+}
+
+.connection-status.disconnected {
+  background: rgba(100, 116, 139, 0.15);
+  color: var(--text-muted);
+}
+
+/* Button Loading State */
+.btn.primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.btn.primary:disabled:hover {
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+/* Spinner */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Input Error State */
+.form-group input.error {
+  border-color: var(--error) !important;
+  animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* Error Message */
+.error-message {
+  color: var(--error);
+  font-size: 12px;
+  margin-top: 6px;
+  padding: 8px 12px;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 6px;
+  border-left: 3px solid var(--error);
+}
+
+/* Loading Status Message */
+.status-message.loading {
+  display: block;
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--accent-glow);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+/* Warning Status Message */
+.status-message.warning {
+  display: block;
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--warning);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}

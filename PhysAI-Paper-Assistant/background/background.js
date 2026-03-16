@@ -188,40 +188,21 @@ async function findSimilarPapers(embedding, threshold = 0.7, limit = 5) {
 }
 
 /**
- * Call LLM API with given prompt
+ * Call LLM API - 只支持 MiniMax 国内版
  */
 async function callLLM(prompt, systemPrompt = '') {
   const settings = await getAllSettings();
   
-  const provider = settings.llmProvider || 'openai';
+  // 只支持 MiniMax
   const apiKey = settings.apiKey;
-  const model = settings.chatModel || 'gpt-4o';
+  const model = settings.chatModel || 'abab6.5s-chat';
   
   if (!apiKey) {
-    throw new Error('API key not configured. Please set up in Settings.');
+    throw new Error('请先在设置里填入 MiniMax API Key（国内版 platform.minimaxi.com）');
   }
 
-  let response;
-  
-  switch (provider) {
-    case 'openai':
-      response = await callOpenAI(apiKey, model, prompt, systemPrompt);
-      break;
-    case 'gemini':
-      response = await callGemini(apiKey, model, prompt, systemPrompt);
-      break;
-    case 'grok':
-      response = await callGrok(apiKey, model, prompt, systemPrompt);
-      break;
-    case 'claude':
-      response = await callClaude(apiKey, model, prompt, systemPrompt);
-      break;
-    case 'minimax':
-      response = await callMinimax(apiKey, model, prompt, systemPrompt);
-      break;
-    default:
-      throw new Error(`Unknown LLM provider: ${provider}`);
-  }
+  console.log('PhysAI: 调用 MiniMax-M2.5-highspeed（国内直连）...');
+  const response = await callMinimax(apiKey, model, prompt, systemPrompt);
   
   return response;
 }
@@ -376,29 +357,21 @@ async function callMinimax(apiKey, model, prompt, systemPrompt) {
 }
 
 /**
- * Generate embedding using configured provider
+ * Generate embedding - 只支持 MiniMax 国内版
  */
 async function generateEmbedding(text) {
   const settings = await getAllSettings();
   
-  const provider = settings.embeddingProvider || 'openai';
+  // 只支持 MiniMax
   const apiKey = settings.apiKey;
-  const model = settings.embeddingModel || 'text-embedding-3-small';
+  const model = settings.embeddingModel || 'embaas-base-v1';
   
   if (!apiKey) {
-    throw new Error('API key not configured');
+    throw new Error('请先在设置里填入 MiniMax API Key');
   }
 
-  switch (provider) {
-    case 'openai':
-      return await generateOpenAIEmbedding(apiKey, model, text);
-    case 'gemini':
-      return await generateGeminiEmbedding(apiKey, text);
-    case 'minimax':
-      return await generateMinimaxEmbedding(apiKey, model, text);
-    default:
-      throw new Error(`Unknown embedding provider: ${provider}`);
-  }
+  console.log('PhysAI: 调用 MiniMax Embedding...');
+  return await generateMinimaxEmbedding(apiKey, model, text);
 }
 
 /**
@@ -650,6 +623,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           const papers = await getAllPapers();
           const paper = papers.find(p => p.id === message.id);
           sendResponse({ success: true, data: paper?.pdfBlob || null });
+          break;
+        
+        case 'TEST_API_KEY':
+          // 测试 API Key 是否有效
+          try {
+            const testResult = await callMinimax(
+              message.apiKey,
+              message.model || 'abab6.5s-chat',
+              'Hello',
+              'Reply with "OK" if you can understand.'
+            );
+            sendResponse({ success: true, data: testResult });
+          } catch (testError) {
+            sendResponse({ success: false, error: testError.message });
+          }
           break;
           
         default:

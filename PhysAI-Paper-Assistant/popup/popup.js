@@ -5,17 +5,88 @@
 
 let currentOutput = '';
 
-// Initialize popup - run immediately when script loads
-// Using immediate execution instead of DOMContentLoaded for reliability
-(function init() {
-  console.log('PhysAI: Popup script loading...');
+// =====================================================
+// ROBUST INITIALIZATION - MV3 Popup 专用
+// =====================================================
+(function() {
+  'use strict';
   
-  // Give DOM a moment to be ready
-  setTimeout(() => {
-    initializeEventListeners();
-    loadPapers().catch(e => console.error('Load papers error:', e));
-    console.log('PhysAI: Init complete');
-  }, 50);
+  var MAX_RETRIES = 5;
+  var RETRY_DELAY = 100;
+  var initAttempts = 0;
+  
+  function domReady() {
+    return document.readyState === 'complete' || document.readyState === 'interactive';
+  }
+  
+  function tryInit() {
+    initAttempts++;
+    console.log('PhysAI: Init attempt ' + initAttempts + '/' + MAX_RETRIES);
+    
+    // 检查 DOM 是否准备好
+    if (!domReady()) {
+      console.log('PhysAI: DOM not ready, retrying...');
+      if (initAttempts < MAX_RETRIES) {
+        setTimeout(tryInit, RETRY_DELAY);
+        return;
+      }
+      console.error('PhysAI: DOM not ready after max retries');
+      return;
+    }
+    
+    // 检查关键元素是否存在
+    var criticalElements = ['papersList', 'paperCount', 'dropZone'];
+    var missing = criticalElements.filter(function(id) { return !document.getElementById(id); });
+    
+    if (missing.length > 0) {
+      console.warn('PhysAI: Missing elements:', missing.join(', '));
+      if (initAttempts < MAX_RETRIES) {
+        setTimeout(tryInit, RETRY_DELAY);
+        return;
+      }
+    }
+    
+    // 执行初始化
+    try {
+      console.log('PhysAI: DOM ready, initializing...');
+      
+      // 1. 先绑定事件监听器（最重要！）
+      initializeEventListeners();
+      console.log('PhysAI: Event listeners attached');
+      
+      // 2. 然后加载数据
+      loadPapers().catch(function(err) { console.error('PhysAI: Load papers error:', err); });
+      console.log('PhysAI: Papers loading started');
+      
+      console.log('PhysAI: Popup fully initialized!');
+      
+      // 验证：检查按钮是否能被选中
+      var testBtn = document.getElementById('openSettings');
+      if (testBtn) {
+        console.log('PhysAI: Buttons verified - getElementById works');
+      }
+      
+    } catch (e) {
+      console.error('PhysAI: Init failed:', e);
+      // 即使失败也尝试重试
+      if (initAttempts < MAX_RETRIES) {
+        setTimeout(tryInit, RETRY_DELAY);
+      }
+    }
+  }
+  
+  // 立即开始尝试初始化
+  console.log('PhysAI: Starting robust init...');
+  
+  if (domReady()) {
+    // 如果 DOM 已经准备好，直接初始化
+    tryInit();
+  } else {
+    // 等待 DOM 准备好
+    document.addEventListener('DOMContentLoaded', tryInit);
+    // 备用：5秒后强制尝试
+    setTimeout(tryInit, 5000);
+  }
 })();
 
 /**
